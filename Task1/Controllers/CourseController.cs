@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Task1.Models;
+using Task1.Models.ViewModel;
 
 namespace Task1.Controllers
 {
@@ -60,6 +61,23 @@ namespace Task1.Controllers
             ViewBag.SelectedCategory = category;
 
             return View(filteredCourses);
+        }
+        public IActionResult Details(int id)
+        {
+            var course = courses.FirstOrDefault(c => c.Id == id);
+            if (course == null)
+                return NotFound();
+
+            var vm = new CourseVM(
+                course.Name,
+                course.Description,
+                course.Category.ToString(),
+                course.StartDate,
+                course.EndDate,
+                course.Instructors.Any() ? course.Instructors.First().Id : 0
+            );
+
+            return View(vm);
         }
     }
 }
