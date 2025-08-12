@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Task1.Models;
 
 namespace Task1.Controllers
@@ -38,9 +39,27 @@ namespace Task1.Controllers
                 IsActive = true
             }
         };
-        public IActionResult Index()
+        public IActionResult Index(string category)
         {
-            return View(courses);
+            var filteredCourses = courses;
+
+            var categories = courses
+                .Select(c => c.Category)
+                .Distinct()
+                .ToList();
+
+            if (!string.IsNullOrEmpty(category) &&
+                Enum.TryParse<CourseCategory>(category, out var parsedCategory))
+            {
+                filteredCourses = filteredCourses
+                    .Where(c => c.Category == parsedCategory)
+                    .ToList();
+            }
+
+            ViewBag.Categories = new SelectList(categories);
+            ViewBag.SelectedCategory = category;
+
+            return View(filteredCourses);
         }
     }
 }
