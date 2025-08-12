@@ -23,6 +23,7 @@
             <th>Start Date</th>
             <th>End Date</th>
             <th>Is Active</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,9 @@
                 <td>@course.StartDate.ToShortDateString()</td>
                 <td>@course.EndDate.ToShortDateString()</td>
                 <td>@course.IsActive</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@course.Id">Details</a>
+                </td>
             </tr>
         }
     </tbody>
