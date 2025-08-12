@@ -1,4 +1,18 @@
 ﻿@model List<Course>
+
+<form method="get" asp-action="Index">
+    <label for="category">Filter by Category:</label>
+    <select id="category" name="category" onchange="this.form.submit()">
+        <option value="">-- All Categories --</option>
+        @foreach (var cat in ViewBag.Categories as SelectList)
+        {
+            <option value="@cat.Text" selected="@(cat.Text == ViewBag.SelectedCategory ? "selected" : null)">
+                @cat.Text
+            </option>
+        }
+    </select>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -19,8 +33,8 @@
                 <td>@course.Name</td>
                 <td>@course.Description</td>
                 <td>@course.Category</td>
-                <td>@course.StartDate</td>
-                <td>@course.EndDate</td>
+                <td>@course.StartDate.ToShortDateString()</td>
+                <td>@course.EndDate.ToShortDateString()</td>
                 <td>@course.IsActive</td>
             </tr>
         }
