@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Task1.Data;
 using Task1.Models;
 using Task1.Models.ViewModel;
 
@@ -7,44 +8,18 @@ namespace Task1.Controllers
 {
     public class CourseController : Controller
     {
-        private static List<Course> courses = new List<Course>
+        private readonly AppDbContext _context;
+
+        public CourseController(AppDbContext context)
         {
-            new Course
-            {
-                Id = 1,
-                Name = "C# Basics",
-                Description = "Learn the fundamentals of C# programming.",
-                Category = CourseCategory.Programming,
-                StartDate = new DateTime(2025, 8, 15),
-                EndDate = new DateTime(2025, 9, 15),
-                IsActive = true
-            },
-            new Course
-            {
-                Id = 2,
-                Name = "UI/UX Design",
-                Description = "Design user friendly and attractive interfaces.",
-                Category = CourseCategory.Design,
-                StartDate = new DateTime(2025, 9, 1),
-                EndDate = new DateTime(2025, 10, 1),
-                IsActive = false
-            },
-            new Course
-            {
-                Id = 3,
-                Name = "Digital Marketing",
-                Description = "Learn how to promote products online effectively.",
-                Category = CourseCategory.Marketing,
-                StartDate = new DateTime(2025, 8, 20),
-                EndDate = new DateTime(2025, 9, 20),
-                IsActive = true
-            }
-        };
+            _context = context;
+        }
+
         public IActionResult Index(string category)
         {
-            var filteredCourses = courses;
+            var filteredCourses = _context.Courses.ToList();
 
-            var categories = courses
+            var categories = _context.Courses
                 .Select(c => c.Category)
                 .Distinct()
                 .ToList();
@@ -62,22 +37,47 @@ namespace Task1.Controllers
 
             return View(filteredCourses);
         }
-        public IActionResult Details(int id)
+
+        public IActionResult Details(Guid id)
         {
-            var course = courses.FirstOrDefault(c => c.Id == id);
+            var course = _context.Courses.FirstOrDefault(c => c.Id == id);
             if (course == null)
                 return NotFound();
 
             var vm = new CourseVM(
-                course.Name,
-                course.Description,
-                course.Category.ToString(),
-                course.StartDate,
-                course.EndDate,
-                course.Instructors.Any() ? course.Instructors.First().Id : 0
-            );
+                 course.Name,
+                 course.Description,
+                 course.Category.ToString(),
+                 course.StartDate,
+                 course.EndDate,
+                 course.Instructors.FirstOrDefault()?.Id ?? 0
+             );
 
             return View(vm);
         }
+        public IActionResult Create()
+        {
+
+            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)));
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult Create(Course course)
+        {
+            if (ModelState.IsValid)
+            {
+                course.Id = Guid.NewGuid(); 
+                _context.Courses.Add(course);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+
+
+            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)));
+            return View(course);
+        }
+
     }
 }
