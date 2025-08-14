@@ -17,6 +17,7 @@ namespace Task1.Models
 
         [Required(ErrorMessage = "Course name is required.")]
         [MaxLength(100, ErrorMessage = "Course name cannot exceed 100 characters.")]
+        [RegularExpression(@"^[^0-9]*$", ErrorMessage = "Course name should not contain numbers.")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Course description is required.")]
