@@ -2,9 +2,9 @@
 
 public interface ICourseService
 {
-    IEnumerable<CourseDetailsVM> GetAllCourses();
-    CourseDetailsVM? GetCourseById(Guid id);
     void CreateCourse(CreateCourseVM model);
     void UpdateCourse(EditCourseVM model);
+    CourseVM GetCourseById(Guid id);
+    IEnumerable<CourseVM> GetAllCourses();
     void DeleteCourse(Guid id);
 }

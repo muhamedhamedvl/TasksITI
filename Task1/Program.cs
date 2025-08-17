@@ -15,11 +15,11 @@ namespace Task1
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddAuthorization();
-            // Register repositories
+
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<IInstructorRepository, InstructorRepository>();
 
-            // Register services (BLL)
+
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IInstructorService, InstructorService>();
             builder.Services.AddDbContext<AppDbContext>(options =>

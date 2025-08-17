@@ -18,7 +18,7 @@ namespace Task1.Controllers
             _instructorRepo = instructorRepo;
         }
 
-        // ===================== READ =====================
+
         public IActionResult Index()
         {
             var courses = _courseService.GetAllCourses();
@@ -32,7 +32,7 @@ namespace Task1.Controllers
             return View(course);
         }
 
-        // ===================== CREATE =====================
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -55,21 +55,27 @@ namespace Task1.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.Instructors = _instructorRepo.GetActiveInstructors()
-                             .Select(i => new SelectListItem
-                             {
-                                 Value = i.Id.ToString(),
-                                 Text = $"{i.FirstName} {i.LastName}"
-                             }).ToList();
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+
+                Console.WriteLine("Validation Errors:");
+                foreach (var err in errors)
+                {
+                    Console.WriteLine(err);
+                }
+
+
                 return View(model);
             }
 
+
             _courseService.CreateCourse(model.Course);
+
             TempData["SuccessMessage"] = "Course created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        // ===================== UPDATE =====================
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
@@ -83,7 +89,7 @@ namespace Task1.Controllers
                     Id = course.Id,
                     Name = course.Name,
                     Description = course.Description,
-                    Category = Enum.Parse<CourseCategory>(course.Category),
+                    Category = course.Category,
                     StartDate = course.StartDate,
                     EndDate = course.EndDate,
                     IsActive = course.IsActive,
@@ -118,11 +124,11 @@ namespace Task1.Controllers
             }
 
             _courseService.UpdateCourse(model.Course);
+
             TempData["SuccessMessage"] = "Course updated successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        // ===================== DELETE =====================
         [HttpGet]
         public IActionResult Delete(Guid id)
         {

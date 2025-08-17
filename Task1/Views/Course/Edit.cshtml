@@ -1,27 +1,69 @@
 ﻿@model Tasks.BLL.ViewModels.EditCoursePageVM
+
 @{
     ViewData["Title"] = "Edit Course";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-primary fw-bold">Edit Course</h2>
+<h2>Edit Course</h2>
 
-    <form asp-action="Edit" method="post" class="shadow p-4 rounded bg-light">
-        @Html.Partial("_CourseForm", Model.Course)
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Course.Id" />
 
-        <div class="form-group mb-3">
-            <label asp-for="Course.InstructorId" class="form-label">Instructor</label>
-            <select asp-for="Course.InstructorId" class="form-select" asp-items="Model.Instructors"></select>
-            <span asp-validation-for="Course.InstructorId" class="text-danger"></span>
-        </div>
+    <div class="form-group">
+        <label asp-for="Course.Name" class="control-label"></label>
+        <input asp-for="Course.Name" class="form-control" />
+        <span asp-validation-for="Course.Name" class="text-danger"></span>
+    </div>
 
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-success px-4">Save</button>
-            <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
-        </div>
-    </form>
-</div>
+    <div class="form-group">
+        <label asp-for="Course.Description" class="control-label"></label>
+        <textarea asp-for="Course.Description" class="form-control"></textarea>
+        <span asp-validation-for="Course.Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Course.Category" class="control-label"></label>
+        <select asp-for="Course.Category" class="form-control"
+                asp-items="Html.GetEnumSelectList<Tasks.DAL.Models.CourseCategory>()">
+        </select>
+        <span asp-validation-for="Course.Category" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Course.StartDate" class="control-label"></label>
+        <input asp-for="Course.StartDate" class="form-control" type="date" />
+        <span asp-validation-for="Course.StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Course.EndDate" class="control-label"></label>
+        <input asp-for="Course.EndDate" class="form-control" type="date" />
+        <span asp-validation-for="Course.EndDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group form-check">
+        <input asp-for="Course.IsActive" class="form-check-input" />
+        <label asp-for="Course.IsActive" class="form-check-label"></label>
+    </div>
+    <div class="form-group">
+        <label asp-for="Course.Hours" class="control-label"></label>
+        <input asp-for="Course.Hours" class="form-control" type="number" />
+        <span asp-validation-for="Course.Hours" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group">
+        <label asp-for="Course.InstructorId" class="control-label"></label>
+        <select asp-for="Course.InstructorId" asp-items="Model.Instructors" class="form-control"></select>
+        <span asp-validation-for="Course.InstructorId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

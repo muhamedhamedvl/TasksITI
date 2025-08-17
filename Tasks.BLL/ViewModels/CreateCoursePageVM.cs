@@ -5,7 +5,7 @@ namespace Tasks.BLL.ViewModels
 {
     public class CreateCoursePageVM
     {
-        public CreateCourseVM Course { get; set; }   
-        public IEnumerable<SelectListItem> Instructors { get; set; }
+        public CreateCourseVM Course { get; set; } = new CreateCourseVM();
+        public List<SelectListItem> Instructors { get; set; } = new List<SelectListItem>();
     }
 }

@@ -7,5 +7,6 @@ namespace Tasks.BLL.ViewModels
     {
         public EditCourseVM Course { get; set; }
         public IEnumerable<SelectListItem> Instructors { get; set; }
+        public int? Hours { get; set; }
     }
 }
