@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tasks.DAL.Data;
 
@@ -11,9 +12,11 @@ using Tasks.DAL.Data;
 namespace Tasks.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817130808_last")]
+    partial class last
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +84,7 @@ namespace Tasks.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Specialization")
+                    b.Property<int>("specialization")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -92,29 +95,29 @@ namespace Tasks.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            Bio = "Expert in C#",
-                            FirstName = "Ali",
+                            Bio = "Senior .NET Developer with 10 years of experience.",
+                            FirstName = "Ahmed",
                             IsActive = true,
                             LastName = "Hassan",
-                            Specialization = 0
+                            specialization = 0
                         },
                         new
                         {
                             Id = 2,
-                            Bio = "Frontend Developer",
-                            FirstName = "Sara",
+                            Bio = "Data Science specialist and AI researcher.",
+                            FirstName = "Mona",
                             IsActive = true,
-                            LastName = "Ahmed",
-                            Specialization = 0
+                            LastName = "Ali",
+                            specialization = 0
                         },
                         new
                         {
                             Id = 3,
-                            Bio = "Full Stack Developer",
+                            Bio = "Cloud computing and DevOps engineer.",
                             FirstName = "Omar",
-                            IsActive = true,
+                            IsActive = false,
                             LastName = "Khaled",
-                            Specialization = 0
+                            specialization = 0
                         });
                 });
 

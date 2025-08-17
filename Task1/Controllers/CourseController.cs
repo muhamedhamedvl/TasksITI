@@ -1,145 +1,143 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Task1.Data;
-using Task1.Models;
-using Task1.Models.ViewModel;
+using Tasks.BLL.Interfaces;
+using Tasks.BLL.ViewModels;
+using Tasks.DAL.Models;
+using Tasks.DAL.Repositories.Interfaces;
 
 namespace Task1.Controllers
 {
     public class CourseController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ICourseService _courseService;
+        private readonly IInstructorRepository _instructorRepo;
 
-        public CourseController(AppDbContext context)
+        public CourseController(ICourseService courseService, IInstructorRepository instructorRepo)
         {
-            _context = context;
+            _courseService = courseService;
+            _instructorRepo = instructorRepo;
         }
 
-        public IActionResult Index(string category)
+        // ===================== READ =====================
+        public IActionResult Index()
         {
-            var categories = _context.Courses
-                .Select(c => c.Category)
-                .Distinct()
-                .ToList();
-
-            var filteredCourses = string.IsNullOrEmpty(category)
-                ? _context.Courses.ToList()
-                : _context.Courses
-                    .Where(c => c.Category == (CourseCategory)Enum.Parse(typeof(CourseCategory), category))
-                    .ToList();
-
-            ViewBag.Categories = new SelectList(categories);
-            ViewBag.SelectedCategory = category;
-
-            return View(filteredCourses);
+            var courses = _courseService.GetAllCourses();
+            return View(courses);
         }
 
         public IActionResult Details(Guid id)
         {
-            var course = _context.Courses.FirstOrDefault(c => c.Id == id);
-            if (course == null)
-                return NotFound();
-
-            var vm = new CourseVM(
-                 course.Name,
-                 course.Description,
-                 course.Category.ToString(),
-                 course.StartDate,
-                 course.EndDate,
-                 course.Instructors.FirstOrDefault()?.Id ?? 0
-             );
-
-            return View(vm);
+            var course = _courseService.GetCourseById(id);
+            if (course == null) return NotFound();
+            return View(course);
         }
 
+        // ===================== CREATE =====================
+        [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)));
-            return View();
+            var vm = new CreateCoursePageVM
+            {
+                Course = new CreateCourseVM(),
+                Instructors = _instructorRepo.GetActiveInstructors()
+                             .Select(i => new SelectListItem
+                             {
+                                 Value = i.Id.ToString(),
+                                 Text = $"{i.FirstName} {i.LastName}"
+                             }).ToList()
+            };
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Course course)
+        public IActionResult Create(CreateCoursePageVM model)
         {
-            if (_context.Courses.Any(c => c.Name.ToLower() == course.Name.ToLower()))
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("Name", "Course already exists.");
+                model.Instructors = _instructorRepo.GetActiveInstructors()
+                             .Select(i => new SelectListItem
+                             {
+                                 Value = i.Id.ToString(),
+                                 Text = $"{i.FirstName} {i.LastName}"
+                             }).ToList();
+                return View(model);
             }
 
-            if (ModelState.IsValid)
-            {
-                course.Id = Guid.NewGuid();
-                _context.Courses.Add(course);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Course created successfully!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)));
-            return View(course);
+            _courseService.CreateCourse(model.Course);
+            TempData["SuccessMessage"] = "Course created successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
-
+        // ===================== UPDATE =====================
+        [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            var course = _context.Courses.FirstOrDefault(c => c.Id == id);
-            if (course == null)
-                return NotFound();
+            var course = _courseService.GetCourseById(id);
+            if (course == null) return NotFound();
 
-            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)), course.Category);
-            return View(course);
+            var vm = new EditCoursePageVM
+            {
+                Course = new EditCourseVM
+                {
+                    Id = course.Id,
+                    Name = course.Name,
+                    Description = course.Description,
+                    Category = Enum.Parse<CourseCategory>(course.Category),
+                    StartDate = course.StartDate,
+                    EndDate = course.EndDate,
+                    IsActive = course.IsActive,
+                    InstructorId = course.InstructorId
+                },
+                Instructors = _instructorRepo.GetActiveInstructors()
+                    .Select(i => new SelectListItem
+                    {
+                        Value = i.Id.ToString(),
+                        Text = $"{i.FirstName} {i.LastName}",
+                        Selected = i.Id == course.InstructorId
+                    }).ToList()
+            };
+
+            return View(vm);
         }
 
         [HttpPost]
-        public IActionResult Edit(Guid id, Course course)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(EditCoursePageVM model)
         {
-            if (id != course.Id)
-                return BadRequest();
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var existing = _context.Courses.FirstOrDefault(c => c.Id == id);
-                if (existing == null)
-                    return NotFound();
-
-                existing.Name = course.Name;
-                existing.Description = course.Description;
-                existing.Category = course.Category;
-                existing.StartDate = course.StartDate;
-                existing.EndDate = course.EndDate;
-                existing.Instructors = course.Instructors;
-
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Course updated successfully!";
-                return RedirectToAction(nameof(Index));
+                model.Instructors = _instructorRepo.GetActiveInstructors()
+                    .Select(i => new SelectListItem
+                    {
+                        Value = i.Id.ToString(),
+                        Text = $"{i.FirstName} {i.LastName}",
+                        Selected = i.Id == model.Course.InstructorId
+                    }).ToList();
+                return View(model);
             }
 
-            ViewBag.Categories = new SelectList(Enum.GetValues(typeof(CourseCategory)), course.Category);
-            return View(course);
+            _courseService.UpdateCourse(model.Course);
+            TempData["SuccessMessage"] = "Course updated successfully.";
+            return RedirectToAction(nameof(Index));
         }
+
+        // ===================== DELETE =====================
+        [HttpGet]
         public IActionResult Delete(Guid id)
         {
-            var course = _context.Courses.FirstOrDefault(c => c.Id == id);
-            if (course == null)
-                return NotFound();
-
+            var course = _courseService.GetCourseById(id);
+            if (course == null) return NotFound();
             return View(course);
         }
 
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            var course = _context.Courses.FirstOrDefault(c => c.Id == id);
-            if (course == null)
-                return NotFound();
-
-            _context.Courses.Remove(course);
-            _context.SaveChanges();
-
-            TempData["SuccessMessage"] = $"Course '{course.Name}' deleted successfully.";
+            _courseService.DeleteCourse(id);
+            TempData["SuccessMessage"] = "Course deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

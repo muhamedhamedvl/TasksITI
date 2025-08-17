@@ -1,6 +1,10 @@
-using Task1.Middleware;
 using Microsoft.EntityFrameworkCore;
-using Task1.Data;
+using Task1.Middleware;
+using Tasks.BLL.Interfaces;
+using Tasks.BLL.Services;
+using Tasks.DAL.Data;
+using Tasks.DAL.Repositories;
+using Tasks.DAL.Repositories.Interfaces;
 namespace Task1
 {
     public class Program
@@ -10,7 +14,14 @@ namespace Task1
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddAuthorization(); 
+            builder.Services.AddAuthorization();
+            // Register repositories
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+            builder.Services.AddScoped<IInstructorRepository, InstructorRepository>();
+
+            // Register services (BLL)
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IInstructorService, InstructorService>();
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

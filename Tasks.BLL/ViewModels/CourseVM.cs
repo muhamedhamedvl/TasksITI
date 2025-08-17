@@ -1,17 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using Tasks.DAL.Models;
 
-namespace Tasks.DAL.Models
+namespace Tasks.BLL.ViewModels
 {
-    public enum CourseCategory
-    {
-        Programming,
-        Design,
-        Marketing
-    }
-
-    public class Course
+    public class CourseVM
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -22,6 +13,6 @@ namespace Tasks.DAL.Models
         public bool IsActive { get; set; }
 
         public int InstructorId { get; set; }
-        public Instructor Instructor { get; set; }
+        public string InstructorFullName { get; set; } = string.Empty; 
     }
 }

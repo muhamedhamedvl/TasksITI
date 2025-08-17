@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tasks.DAL.Data;
 
@@ -11,9 +12,11 @@ using Tasks.DAL.Data;
 namespace Tasks.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817122414_edited")]
+    partial class edited
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace Tasks.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CourseInstructor", b =>
+                {
+                    b.Property<Guid>("CoursesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InstructorsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CoursesId", "InstructorsId");
+
+                    b.HasIndex("InstructorsId");
+
+                    b.ToTable("CourseInstructor");
+                });
 
             modelBuilder.Entity("Tasks.DAL.Models.Course", b =>
                 {
@@ -33,13 +51,11 @@ namespace Tasks.DAL.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("InstructorId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -52,8 +68,6 @@ namespace Tasks.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InstructorId");
 
                     b.ToTable("Courses");
                 });
@@ -81,57 +95,27 @@ namespace Tasks.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Specialization")
+                    b.Property<int>("specialization")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("Instructors");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Bio = "Expert in C#",
-                            FirstName = "Ali",
-                            IsActive = true,
-                            LastName = "Hassan",
-                            Specialization = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Bio = "Frontend Developer",
-                            FirstName = "Sara",
-                            IsActive = true,
-                            LastName = "Ahmed",
-                            Specialization = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Bio = "Full Stack Developer",
-                            FirstName = "Omar",
-                            IsActive = true,
-                            LastName = "Khaled",
-                            Specialization = 0
-                        });
                 });
 
-            modelBuilder.Entity("Tasks.DAL.Models.Course", b =>
+            modelBuilder.Entity("CourseInstructor", b =>
                 {
-                    b.HasOne("Tasks.DAL.Models.Instructor", "Instructor")
-                        .WithMany("Courses")
-                        .HasForeignKey("InstructorId")
+                    b.HasOne("Tasks.DAL.Models.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CoursesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Instructor");
-                });
-
-            modelBuilder.Entity("Tasks.DAL.Models.Instructor", b =>
-                {
-                    b.Navigation("Courses");
+                    b.HasOne("Tasks.DAL.Models.Instructor", null)
+                        .WithMany()
+                        .HasForeignKey("InstructorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

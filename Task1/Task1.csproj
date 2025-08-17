@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tasks.BLL\Tasks.BLL.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,16 +1,9 @@
 ﻿using System.Collections.Generic;
+using Tasks.DAL.Models;
 
-namespace Tasks.DAL.Models
+namespace Tasks.BLL.ViewModels
 {
-    public enum Specialization
-    {
-        SoftwareDevelopment,
-        Marketing,
-        Business,
-        Design
-    }
-
-    public class Instructor
+    public class InstructorVM
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
@@ -18,6 +11,7 @@ namespace Tasks.DAL.Models
         public string Bio { get; set; } = string.Empty;
         public Specialization Specialization { get; set; }
         public bool IsActive { get; set; }
-        public ICollection<Course> Courses { get; set; } = new List<Course>();
+
+        public List<string> Courses { get; set; } = new(); 
     }
 }

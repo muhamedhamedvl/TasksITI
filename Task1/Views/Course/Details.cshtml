@@ -1,5 +1,5 @@
-﻿@model CourseVM
-
+﻿@using Tasks.BLL.ViewModels
+@model CourseDetailsVM
 
 <h2>@Model.Name</h2>
 
@@ -8,7 +8,6 @@
     <p><strong>Category:</strong> @Model.Category</p>
     <p><strong>Start Date:</strong> @Model.StartDate.ToString("yyyy-MM-dd")</p>
     <p><strong>End Date:</strong> @Model.EndDate.ToString("yyyy-MM-dd")</p>
-    <p><strong>Instructor Id:</strong> @(Model.InstructorId != 0 ? Model.InstructorId.ToString() : "No Instructor Assigned")</p>
 </div>
 
 <a asp-action="Index" class="btn btn-secondary">Back to Courses</a>
