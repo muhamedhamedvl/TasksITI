@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Task1.Models
@@ -15,9 +16,9 @@ namespace Task1.Models
         [Key]
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "Course name is required.")]
-        [MaxLength(100, ErrorMessage = "Course name cannot exceed 100 characters.")]
-        [RegularExpression(@"^[^0-9]*$", ErrorMessage = "Course name should not contain numbers.")]
+        [Required]
+        [Remote(action: "CheckCourseName", controller: "Courses")]
+        [NoNumber] 
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Course description is required.")]
