@@ -13,7 +13,11 @@ namespace Tasks.DAL.Repositories
         public IEnumerable<Course> GetAll() => _context.Courses.Include(c => c.Instructor).ToList();
         public Course? GetById(Guid id) => _context.Courses.Include(c => c.Instructor).FirstOrDefault(c => c.Id == id);
         public void Add(Course course) => _context.Courses.Add(course);
-        public void Update(Course course) => _context.Courses.Update(course);
+        public void Update(Course course)
+        {
+            _context.Courses.Update(course);
+            _context.SaveChanges();
+        }
         public void Delete(Guid id)
         {
             var course = _context.Courses.Find(id);

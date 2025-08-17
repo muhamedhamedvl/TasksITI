@@ -1,4 +1,5 @@
-﻿using Tasks.BLL.ViewModels;
+﻿using Microsoft.EntityFrameworkCore;
+using Tasks.BLL.ViewModels;
 using Tasks.DAL.Models;
 using Tasks.DAL.Repositories.Interfaces;
 
@@ -29,23 +30,23 @@ public class CourseService : ICourseService
         _repo.Save();
     }
 
-    public void UpdateCourse(EditCourseVM model)
+    public bool UpdateCourse(CourseVM vm)
     {
-        var course = _repo.GetById(model.Id);
-        if (course == null) return;
+        var course = _repo.GetById(vm.Id);
+        if (course == null) return false;
 
-        course.Name = model.Name;
-        course.Description = model.Description;
-        course.Category = model.Category;
-        course.StartDate = model.StartDate;
-        course.EndDate = model.EndDate;
-        course.IsActive = model.IsActive;
-        course.InstructorId = model.InstructorId;
+        course.Name = vm.Name;
+        course.Description = vm.Description;
+        course.Category = vm.Category;
+        course.StartDate = vm.StartDate;
+        course.EndDate = vm.EndDate;
+        course.IsActive = vm.IsActive;
+        course.Hours = vm.Hours;
+        course.InstructorId = vm.InstructorId;
 
         _repo.Update(course);
-        _repo.Save();
+        return true;
     }
-
     public CourseVM GetCourseById(Guid id)
     {
         var course = _repo.GetById(id);
@@ -83,9 +84,7 @@ public class CourseService : ICourseService
 
     public void DeleteCourse(Guid id)
     {
-        var course = _repo.GetById(id);
-        if (course == null) return;
-        _repo.Delete(course.Id); 
+        _repo.Delete(id);
         _repo.Save();
     }
 }

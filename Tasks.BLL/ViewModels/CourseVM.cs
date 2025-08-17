@@ -25,6 +25,7 @@ namespace Tasks.BLL.ViewModels
         public DateTime EndDate { get; set; }
 
         public bool IsActive { get; set; }
+        public int Hours { get; set; }
 
         [Required]
         public int InstructorId { get; set; }

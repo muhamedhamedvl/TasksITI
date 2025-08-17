@@ -76,58 +76,29 @@ namespace Task1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
+
         public IActionResult Edit(Guid id)
         {
             var course = _courseService.GetCourseById(id);
             if (course == null) return NotFound();
 
-            var vm = new EditCoursePageVM
-            {
-                Course = new EditCourseVM
-                {
-                    Id = course.Id,
-                    Name = course.Name,
-                    Description = course.Description,
-                    Category = course.Category,
-                    StartDate = course.StartDate,
-                    EndDate = course.EndDate,
-                    IsActive = course.IsActive,
-                    InstructorId = course.InstructorId
-                },
-                Instructors = _instructorRepo.GetActiveInstructors()
-                    .Select(i => new SelectListItem
-                    {
-                        Value = i.Id.ToString(),
-                        Text = $"{i.FirstName} {i.LastName}",
-                        Selected = i.Id == course.InstructorId
-                    }).ToList()
-            };
-
-            return View(vm);
+            return View(course); 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EditCoursePageVM model)
+        public IActionResult Edit(CourseVM model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                model.Instructors = _instructorRepo.GetActiveInstructors()
-                    .Select(i => new SelectListItem
-                    {
-                        Value = i.Id.ToString(),
-                        Text = $"{i.FirstName} {i.LastName}",
-                        Selected = i.Id == model.Course.InstructorId
-                    }).ToList();
-                return View(model);
+                var updated = _courseService.UpdateCourse(model);
+                if (updated) return RedirectToAction(nameof(Index));
+
+                return NotFound();
             }
-
-            _courseService.UpdateCourse(model.Course);
-
-            TempData["SuccessMessage"] = "Course updated successfully.";
-            return RedirectToAction(nameof(Index));
+            return View(model);
         }
+
 
         [HttpGet]
         public IActionResult Delete(Guid id)
@@ -136,13 +107,11 @@ namespace Task1.Controllers
             if (course == null) return NotFound();
             return View(course);
         }
-
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
             _courseService.DeleteCourse(id);
-            TempData["SuccessMessage"] = "Course deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
     }
